@@ -7,6 +7,7 @@ This repo contains reusable agent skills for Evotek workflows.
 | Skill | Location | What it does |
 |-------|----------|-------------|
 | `cv-to-form` | `skills/cv-to-form/` | Converts a candidate CV (PDF) into the Evotek intake form (.docx) |
+| `cv-fab-questionaire` | `skills/cv-fab-questionaire/` | Extracts real CV info, enriches based on questionnaire, fills questionnaire answers |
 
 ## How to use
 

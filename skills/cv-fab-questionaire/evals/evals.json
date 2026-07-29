@@ -1,0 +1,23 @@
+{
+  "skill_name": "cv-fab-questionaire",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Cook CV for candidate Nguyen Thanh Lap. CV: sample/unfabricated/CV_AI_Engineer_Nguyen-Thanh-Lap.pdf, Questionnaire: sample/unfabricated/90. AI Engineer - questionnaire.xlsx. Output to sample/result/",
+      "expected_output": "Three xlsx files: Cv-NguyenThanhLap-extracted-real.xlsx, cv-NguyenThanhLap-extracted-fab.xlsx, bang-cau-hoi-result.xlsx in sample/result/",
+      "files": ["sample/unfabricated/CV_AI_Engineer_Nguyen-Thanh-Lap.pdf", "sample/unfabricated/90. AI Engineer - questionnaire.xlsx"]
+    },
+    {
+      "id": 2,
+      "prompt": "Chạy workflow cook CV cho ứng viên Le Tien Tien. File CV gốc ở sample/Le-Tien-Tien/Evotek_CV_LeTienTien.xlsx, questionnaire ở sample/Le-Tien-Tien/Manual Test (1) (2).xlsx. Xuất kết quả vào cases/le-tien-tien/",
+      "expected_output": "Three xlsx files in cases/le-tien-tien/ with correct Vietnamese content and proper formatting",
+      "files": ["sample/Le-Tien-Tien/Evotek_CV_LeTienTien.xlsx", "sample/Le-Tien-Tien/Manual Test (1) (2).xlsx"]
+    },
+    {
+      "id": 3,
+      "prompt": "Process this candidate CV and fill the questionnaire. I have cv-candidate.pdf and the customer's questionnaire.xlsx. Please extract the real info first, then fabricate based on the questionnaire, and fill in the questionnaire answers too.",
+      "expected_output": "Agent should ask for file paths or process files if provided, producing the standard 3-file output",
+      "files": []
+    }
+  ]
+}

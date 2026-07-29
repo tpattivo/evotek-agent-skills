@@ -7,6 +7,7 @@ A collection of agent skills for automating Evotek workflows.
 | Skill | Description |
 |-------|-------------|
 | [`cv-to-form`](skills/cv-to-form/) | Convert a candidate CV (PDF) into the Evotek intake form (.docx) |
+| [`cv-fab-questionaire`](skills/cv-fab-questionaire/) | Extract, enrich, and fabricate candidate CVs based on customer questionnaire (.xlsx) |
 
 ## Installation
 

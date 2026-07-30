@@ -147,6 +147,13 @@ def clone_project_table(source_tbl, project_data, label):
     else:
         src_elem.addnext(clone_elem)
 
+    # Ensure a spacing paragraph exists after the cloned table so the NEXT
+    # clone (or sectPr) has a <w:p> separator to anchor to.
+    nxt = clone_elem.getnext()
+    nxt_tag = nxt.tag.split('}')[-1] if nxt is not None and '}' in (nxt.tag or '') else (nxt.tag if nxt is not None else '')
+    if nxt is None or nxt_tag != 'p':
+        clone_elem.addnext(make_empty_para())
+
     new_tbl = Table(clone_elem, source_tbl.part)
 
     # Set label in first column, first row

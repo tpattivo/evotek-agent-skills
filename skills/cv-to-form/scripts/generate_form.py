@@ -2,12 +2,17 @@
 Generate a filled Evotek CV form from template and extracted candidate data.
 
 Usage:
-  1. Edit the DATA section below with extracted CV information.
-  2. Run: python generate_form.py <path-to-original-cv-pdf>
+  Single CV:  1. Edit the DATA section below with extracted CV information.
+              2. Run: python generate_form.py <path-to-original-cv-pdf>
+
+  Parallel:   1. Write the candidate data to a JSON file (keys are the DATA
+                 SECTION variable names; missing keys fall back to the
+                 defaults declared below).
+              2. Run: python generate_form.py <path-to-pdf> <data.json>
 
 The output .docx will be saved in the same folder as the input PDF.
 """
-import os, sys, copy
+import copy, json, os, sys
 from docx import Document
 from docx.table import Table
 from docx.oxml.ns import qn
@@ -76,9 +81,27 @@ PROJECTS = [
 # ═══════════════════════════════════════════════════════════════════════════
 
 INPUT_PDF = sys.argv[1] if len(sys.argv) > 1 else (
-    print('Usage: python generate_form.py <path-to-pdf>') or sys.exit(1)
+    print('Usage: python generate_form.py <path-to-pdf> [<data.json>]') or sys.exit(1)
 )
 INPUT_DIR = os.path.dirname(os.path.abspath(INPUT_PDF))
+
+# ── Optional JSON data override (parallel / scripted mode) ────────────────
+# Run: python generate_form.py <path-to-pdf> <data.json>
+# Keys mirror the DATA SECTION variable names above; missing keys keep the
+# defaults declared there.
+
+DATA_JSON = sys.argv[2] if len(sys.argv) > 2 else None
+DATA_KEYS = ['CANDIDATE_SLUG', 'OUTPUT_LANG', 'NAME', 'ROLE', 'ACHI',
+             'EDU1_YEAR', 'EDU1_DETAIL', 'EDU2_YEAR', 'EDU2_DETAIL',
+             'ENG_MARK', 'TECH_OS', 'TECH_DB', 'TECH_PROG', 'TECH_DEVTOOL',
+             'TECH_METHOD', 'PROJECTS']
+
+if DATA_JSON:
+    with open(DATA_JSON, encoding='utf-8') as f:
+        override = json.load(f)
+    for key in DATA_KEYS:
+        if key in override:
+            globals()[key] = override[key]
 
 # Resolve template relative to THIS script's directory
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))

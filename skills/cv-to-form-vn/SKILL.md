@@ -109,6 +109,9 @@ Open `<skill-dir>/scripts/generate_form.py` and fill in every variable in the
 }
 ```
 
+> **Batch note:** when processing multiple CVs in parallel, skip this step —
+> write a JSON data file instead (see **Batch Processing** below).
+
 ### Step 4 — Run the form generator
 
 ```bash
@@ -152,6 +155,92 @@ Confirm all of the following:
 - The output file is in the same folder as the input PDF
 
 ---
+
+## Batch Processing — Multiple CVs in Parallel (Sub-Agents)
+
+To process several CVs at once, fan out one sub-agent per CV. Parallel is safe
+because each worker writes its **own** JSON data file instead of editing the
+shared `generate_form.py`.
+
+### Output language
+
+Ask the Step 1 question a single time, then pass the chosen language to every
+sub-agent prompt.
+
+### Launching the sub-agents
+
+Each prompt must be self-contained (sub-agents don't inherit this
+conversation). Fill in absolute paths:
+
+```text
+Convert the CV at <abs-path-to-cv.pdf> into the Evotek intake form (Vietnamese headings).
+Output language: <chosen-language>.
+
+1. Extract the CV text:
+   python <skill-dir>/scripts/extract_cv_text.py <abs-path-to-cv.pdf>
+2. Write the candidate data to <abs-path-to-data.json> (schema below).
+   Never edit generate_form.py.
+3. Generate the form:
+   python <skill-dir>/scripts/generate_form.py <abs-path-to-cv.pdf> <abs-path-to-data.json>
+4. Verify the output .docx with the Step 5 checklist.
+
+Report the output file path and the verification result.
+```
+
+### JSON data file
+
+Keys are the DATA SECTION variable names. Omit any key to fall back to the
+defaults in `generate_form.py`. The Step 3 filling rules still apply (every
+project in `PROJECTS`, `- ` bullets, `"No info"` for missing fields, detailed
+descriptions, all content in the chosen output language).
+
+```json
+{
+  "CANDIDATE_SLUG": "PhanTienDat",
+  "OUTPUT_LANG": "Vietnamese",
+  "NAME": "Phan Tien Dat",
+  "ROLE": "Fullstack Developer",
+  "ACHI": "- Achievement 1\n- Achievement 2\n- Achievement 3",
+  "EDU1_YEAR": "2020 - 2024",
+  "EDU1_DETAIL": "B.Eng, HCMUT\nGPA: 3.2",
+  "EDU2_YEAR": "No info",
+  "EDU2_DETAIL": "No info",
+  "ENG_MARK": "IELTS 7.0",
+  "TECH_OS": "Windows, Linux",
+  "TECH_DB": "MySQL, PostgreSQL",
+  "TECH_PROG": "Python, JavaScript, C#",
+  "TECH_DEVTOOL": "Git, Docker, VS Code",
+  "TECH_METHOD": "Agile/Scrum",
+  "PROJECTS": [
+    {
+      "name": "Project Name",
+      "duration": "01/2023 - 12/2023",
+      "pos": "Role",
+      "size": "No info",
+      "des": "Project description.",
+      "res": "- Responsibility 1\n- Responsibility 2",
+      "tech": "Tech 1, Tech 2"
+    }
+  ]
+}
+```
+
+### Why parallel is safe
+
+| Piece | Shared state? |
+|-------|---------------|
+| `extract_cv_text.py` | no — read-only |
+| `<slug>.json` per CV | no — one file per sub-agent |
+| output `.docx` | no — slug-named, written next to its PDF |
+| verification | no — read-only |
+
+### Batch pitfalls
+
+- **Never** let two sub-agents edit `generate_form.py` — the DATA SECTION is a
+  single shared file; concurrent edits race and the last writer wins.
+- Keep slugs unique — two CVs with the same slug overwrite each other's output.
+- The JSON file is never modified by the script, so re-running the generator
+  is idempotent.
 
 ## Common Pitfalls
 
